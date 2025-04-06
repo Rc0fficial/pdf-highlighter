@@ -1,11 +1,12 @@
 import { useState, useRef } from 'react';
-import { PlusCircle, Trash2, Copy, Download, Sun, Moon, ChevronRight } from 'lucide-react';
+import { PlusCircle, Trash2, Copy, Download, Sun, Moon, ChevronRight, Menu, X } from 'lucide-react';
 
 export function PdfHighlighter() {
   const [highlights, setHighlights] = useState([]);
   const [currentCategory, setCurrentCategory] = useState('Uncategorized');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pdfContainerRef = useRef(null);
 
   // Sample PDF text (replace with actual PDF rendering later)
@@ -114,12 +115,43 @@ export function PdfHighlighter() {
     };
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // Close sidebar function for mobile views
+  const closeSidebar = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
-      {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-80' : 'w-0'} transition-all duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r overflow-hidden flex flex-col`}>
-        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+    <div className={`flex flex-col md:flex-row h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+      {/* Mobile sidebar overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
+      {/* Sidebar - hidden on mobile by default, shown when mobileMenuOpen is true */}
+      <div className={`
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+        md:translate-x-0
+        ${sidebarOpen ? 'md:w-80' : 'md:w-0'} 
+        fixed md:relative w-80 h-full z-50
+        transition-all duration-300 
+        ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} 
+        border-r overflow-hidden flex flex-col
+      `}>
+        <div className="flex justify-between items-center p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
           <h2 className="text-lg font-semibold">Highlighted Text</h2>
+          <button 
+            onClick={closeSidebar}
+            className="md:hidden"
+          >
+            <X size={20} />
+          </button>
         </div>
         
         <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -202,57 +234,70 @@ export function PdfHighlighter() {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b shadow-sm z-10`}>
-          <div className="flex justify-between items-center px-6 py-4">
-            <div className="flex items-center gap-4">
+          <div className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4">
+            <div className="flex items-center gap-2 md:gap-4">
+              {/* Mobile menu button */}
+              <button 
+                onClick={toggleMobileMenu}
+                className="md:hidden"
+              >
+                <Menu size={20} />
+              </button>
+              
+              {/* Desktop sidebar toggle */}
               <button 
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`hidden md:block ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 <ChevronRight size={20} className={`transform transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
               </button>
-              <h1 className="text-xl font-bold">PDF Text Highlighter</h1>
+              
+              <h1 className="text-lg md:text-xl font-bold truncate">PDF Text Highlighter</h1>
             </div>
-            <div className="flex gap-3">
+            
+            <div className="flex gap-1 md:gap-3">
               <button
                 onClick={toggleDarkMode}
-                className={`p-2 rounded-full ${
+                className={`p-1 md:p-2 rounded-full ${
                   isDarkMode 
                     ? 'hover:bg-gray-700 text-gray-400' 
                     : 'hover:bg-gray-100 text-gray-500'
                 }`}
               >
-                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
               </button>
+              
               <button 
                 onClick={handleHighlight}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm font-medium"
+                className="px-2 md:px-4 py-1 md:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-colors flex items-center gap-1 md:gap-2 text-xs md:text-sm font-medium"
               >
-                <PlusCircle size={16} />
-                Highlight Selection
+                <PlusCircle size={14} className="hidden sm:block" />
+                <span className="truncate">Highlight</span>
               </button>
+              
               <button 
-                className={`px-4 py-2 ${
+                className={`px-2 md:px-4 py-1 md:py-2 ${
                   isDarkMode 
                     ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600' 
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                } border rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm font-medium`}
+                } border rounded-lg shadow-sm transition-colors flex items-center gap-1 md:gap-2 text-xs md:text-sm font-medium`}
               >
-                <Download size={16} />
-                Export
+                <Download size={14} className="hidden sm:block" />
+                <span className="truncate">Export</span>
               </button>
             </div>
           </div>
         </header>
         
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-2 sm:p-4 md:p-6">
           <div className="max-w-4xl mx-auto">
             <div 
               ref={pdfContainerRef}
-              className={`relative p-8 ${
+              className={`relative p-4 md:p-8 ${
                 isDarkMode 
                   ? 'bg-gray-800 border-gray-700 text-gray-200' 
                   : 'bg-white border-gray-200 text-gray-800'
-              } border rounded-lg shadow-sm min-h-[700px] whitespace-pre-wrap`}
+              } border rounded-lg shadow-sm min-h-[400px] md:min-h-[700px] whitespace-pre-wrap text-sm md:text-base`}
             >
               {sampleText}
               
