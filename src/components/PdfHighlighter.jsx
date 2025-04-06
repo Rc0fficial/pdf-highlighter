@@ -13,11 +13,11 @@ export function PdfHighlighter() {
 
   // Predefined categories with colors
   const categories = [
-    { name: 'Uncategorized', color: 'bg-yellow-200 dark:bg-yellow-300/60' },
-    { name: 'Important', color: 'bg-red-200 dark:bg-red-300/60' },
-    { name: 'Review', color: 'bg-blue-200 dark:bg-blue-300/60' },
-    { name: 'Question', color: 'bg-green-200 dark:bg-green-300/60' },
-    { name: 'Note', color: 'bg-purple-200 dark:bg-purple-300/60' }
+    { name: 'Uncategorized', color: 'bg-yellow-200/60 dark:bg-yellow-300/40' },
+    { name: 'Important', color: 'bg-red-200/60 dark:bg-red-300/40' },
+    { name: 'Review', color: 'bg-blue-200/60 dark:bg-blue-300/40' },
+    { name: 'Question', color: 'bg-green-200/60 dark:bg-green-300/40' },
+    { name: 'Note', color: 'bg-purple-200/60 dark:bg-purple-300/40' }
   ];
 
   const handleHighlight = () => {
@@ -102,7 +102,7 @@ export function PdfHighlighter() {
                   className="p-3 rounded-lg bg-white dark:bg-gray-700 shadow-sm group hover:shadow-md transition-shadow"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${highlight.color}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${highlight.color.split(' ')[0]}`}>
                       {highlight.category}
                     </span>
                     <button 
@@ -187,15 +187,18 @@ export function PdfHighlighter() {
               className="relative p-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm min-h-[700px] whitespace-pre-wrap text-gray-800 dark:text-gray-200"
             >
               {sampleText}
+              
+              {/* Rendering highlights with z-index below text */}
               {highlights.map(highlight => (
                 <div 
                   key={highlight.id}
-                  className={`absolute pointer-events-none ${highlight.color}`}
+                  className={`absolute pointer-events-none ${highlight.color} mix-blend-multiply dark:mix-blend-screen`}
                   style={{
                     top: `${highlight.position.top}px`,
                     left: `${highlight.position.left}px`,
                     width: `${highlight.position.width}px`,
-                    height: `${highlight.position.height}px`
+                    height: `${highlight.position.height}px`,
+                    zIndex: 1
                   }}
                 />
               ))}
