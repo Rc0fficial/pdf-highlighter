@@ -11,13 +11,43 @@ export function PdfHighlighter() {
   // Sample PDF text (replace with actual PDF rendering later)
   const sampleText = `three funds: one fund that is actively investing...`;
 
-  // Predefined categories with colors
+  // Define colors with actual CSS values instead of Tailwind classes
   const categories = [
-    { name: 'Uncategorized', color: 'bg-yellow-200/60', darkColor: 'bg-yellow-300/40' },
-    { name: 'Important', color: 'bg-red-200/60', darkColor: 'bg-red-300/40' },
-    { name: 'Review', color: 'bg-blue-200/60', darkColor: 'bg-blue-300/40' },
-    { name: 'Question', color: 'bg-green-200/60', darkColor: 'bg-green-300/40' },
-    { name: 'Note', color: 'bg-purple-200/60', darkColor: 'bg-purple-300/40' }
+    { 
+      name: 'Uncategorized', 
+      lightColor: 'rgba(254, 240, 138, 0.6)', 
+      darkColor: 'rgba(253, 224, 71, 0.4)',
+      buttonColor: 'rgba(254, 240, 138, 0.9)',
+      darkButtonColor: 'rgba(253, 224, 71, 0.7)'
+    },
+    { 
+      name: 'Important', 
+      lightColor: 'rgba(254, 202, 202, 0.6)', 
+      darkColor: 'rgba(252, 165, 165, 0.4)',
+      buttonColor: 'rgba(254, 202, 202, 0.9)',
+      darkButtonColor: 'rgba(252, 165, 165, 0.7)'
+    },
+    { 
+      name: 'Review', 
+      lightColor: 'rgba(191, 219, 254, 0.6)', 
+      darkColor: 'rgba(147, 197, 253, 0.4)',
+      buttonColor: 'rgba(191, 219, 254, 0.9)',
+      darkButtonColor: 'rgba(147, 197, 253, 0.7)'
+    },
+    { 
+      name: 'Question', 
+      lightColor: 'rgba(187, 247, 208, 0.6)', 
+      darkColor: 'rgba(134, 239, 172, 0.4)',
+      buttonColor: 'rgba(187, 247, 208, 0.9)',
+      darkButtonColor: 'rgba(134, 239, 172, 0.7)'
+    },
+    { 
+      name: 'Note', 
+      lightColor: 'rgba(233, 213, 255, 0.6)', 
+      darkColor: 'rgba(216, 180, 254, 0.4)',
+      buttonColor: 'rgba(233, 213, 255, 0.9)',
+      darkButtonColor: 'rgba(216, 180, 254, 0.7)'
+    }
   ];
 
   const handleHighlight = () => {
@@ -40,7 +70,7 @@ export function PdfHighlighter() {
         height: rangeRect.height
       },
       category: currentCategory,
-      color: category.color,
+      lightColor: category.lightColor,
       darkColor: category.darkColor
     }]);
 
@@ -62,21 +92,25 @@ export function PdfHighlighter() {
     setHighlights(highlights.filter(highlight => highlight.id !== id));
   };
 
-  // Get appropriate color based on mode
-  const getCategoryColor = (category) => {
-    const foundCategory = categories.find(c => c.name === category);
-    return isDarkMode ? foundCategory.darkColor : foundCategory.color;
-  };
-
   // Get button style based on category
   const getCategoryButtonStyle = (categoryName) => {
     const category = categories.find(c => c.name === categoryName);
-    const baseColor = isDarkMode ? category.darkColor : category.color;
+    const isSelected = currentCategory === categoryName;
     
     return {
-      backgroundColor: isDarkMode ? 'rgba(50, 50, 50, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-      border: currentCategory === categoryName ? '2px solid #3b82f6' : '1px solid #e5e7eb',
-      color: isDarkMode ? '#e5e7eb' : '#374151'
+      backgroundColor: isDarkMode ? category.darkButtonColor : category.buttonColor,
+      border: isSelected ? '2px solid #3b82f6' : '1px solid #e5e7eb',
+      color: isDarkMode ? '#1f2937' : '#1f2937',
+      fontWeight: isSelected ? '600' : '500'
+    };
+  };
+
+  // Get badge style in sidebar
+  const getCategoryBadgeStyle = (categoryName) => {
+    const category = categories.find(c => c.name === categoryName);
+    return {
+      backgroundColor: isDarkMode ? category.darkButtonColor : category.buttonColor,
+      color: '#1f2937'
     };
   };
 
@@ -115,10 +149,7 @@ export function PdfHighlighter() {
                   <div className="flex justify-between items-start mb-2">
                     <span 
                       className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ 
-                        backgroundColor: isDarkMode ? 'rgba(50, 50, 50, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                        border: `1px solid ${isDarkMode ? '#4b5563' : '#e5e7eb'}` 
-                      }}
+                      style={getCategoryBadgeStyle(highlight.category)}
                     >
                       {highlight.category}
                     </span>
@@ -236,17 +267,7 @@ export function PdfHighlighter() {
                     width: `${highlight.position.width}px`,
                     height: `${highlight.position.height}px`,
                     zIndex: 1,
-                    backgroundColor: isDarkMode 
-                      ? highlight.darkColor.replace('bg-', '').split('/')[0] === 'yellow-300' ? 'rgba(253, 224, 71, 0.4)' 
-                      : highlight.darkColor.replace('bg-', '').split('/')[0] === 'red-300' ? 'rgba(252, 165, 165, 0.4)'
-                      : highlight.darkColor.replace('bg-', '').split('/')[0] === 'blue-300' ? 'rgba(147, 197, 253, 0.4)'
-                      : highlight.darkColor.replace('bg-', '').split('/')[0] === 'green-300' ? 'rgba(134, 239, 172, 0.4)'
-                      : 'rgba(216, 180, 254, 0.4)'
-                      : highlight.color.replace('bg-', '').split('/')[0] === 'yellow-200' ? 'rgba(254, 240, 138, 0.6)'
-                      : highlight.color.replace('bg-', '').split('/')[0] === 'red-200' ? 'rgba(254, 202, 202, 0.6)'
-                      : highlight.color.replace('bg-', '').split('/')[0] === 'blue-200' ? 'rgba(191, 219, 254, 0.6)'
-                      : highlight.color.replace('bg-', '').split('/')[0] === 'green-200' ? 'rgba(187, 247, 208, 0.6)'
-                      : 'rgba(233, 213, 255, 0.6)',
+                    backgroundColor: isDarkMode ? highlight.darkColor : highlight.lightColor,
                     mixBlendMode: isDarkMode ? 'screen' : 'multiply'
                   }}
                 />
